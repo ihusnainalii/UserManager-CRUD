@@ -25,6 +25,7 @@ exports.create = async (req, res) => {
 
         // Check if user with the same email already exists
         const existingUser = await UserModel.findOne({ email });
+
         if (existingUser) {
             return res.status(409).send({ message: `Email ${email} already exists.` });
         }
@@ -75,7 +76,7 @@ exports.findAll = async (req, res) => {
         // Retrieve users with pagination
         const users = await UserModel.find()
             .skip(skip)
-            .limit(limit);
+            .limit(limit)
 
         // Return paginated list of users and metadata
         return res.status(200).send({
@@ -93,21 +94,23 @@ exports.findAll = async (req, res) => {
 
 // Find a single User with an id
 exports.findOne = async (req, res) => {
-    try {
-        const user = await UserModel.findById(req.params.id);
-
-        // Check if the user exists
+    await UserModel.findById(req.params.id).then(user => {
         if (!user) {
-            return res.status(404).json({ message: `User with ID ${req.params.id} not found.` });
+            // Check if the user exists
+            return res.status(404).json({ 
+                message: `User with ID ${req.params.id} not found.` 
+            });
+        } else {
+            return res.status(200).send({
+                message: `Successfully retieved user with id ${req.params.id}!`,
+                user: user
+            });
         }
-
-        return res.status(200).send({
-            message: `Successfully retieved user with id ${req.params.id}!`,
-            user: user
+    }).catch(err => {
+        res.status(404).send({
+            message: err.message
         });
-    } catch (error) {
-        res.status(404).json({ message: error.message });
-    }
+    });
 };
 
 // Update a user by the id in the request
