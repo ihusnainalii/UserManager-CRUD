@@ -21,10 +21,15 @@ app.listen(config.port, () => {
 
 console.log(`Your app is ${config.app_name}`);
 console.log(`Your port is ${config.port}`);
-console.log(`Your db uri is ${config.db_uri}`);
+console.log(`Your db port is ${config.db_port}`);
+console.log(`Your db name ip is ${config.db_name_ip}`);
+console.log(`Your db name is ${config.db_name}`);
 
 mongoose.Promise = global.Promise;
-mongoose.connect(config.db_uri, {}).then(() => {
+
+const mongoURL = `mongodb://${config.db_user}:${config.db_password}@${config.db_name_ip}:${config.db_port}/${config.db_name}?authSource=admin`;
+
+mongoose.connect(mongoURL, {}).then(() => {
     console.log("Databse Connected Successfully!!");    
 }).catch(err => {
     console.log('Could not connect to the database', err);
