@@ -10,41 +10,50 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Step 2: Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: |
           cd crud-node-express  # Change to the correct directory
           npm install
 
+      # Step 4: Log in to Docker Hub using secrets
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # Step 5: Get Git commit SHA to use as version tag for the Docker image
       - name: Get Git Commit SHA
         id: vars
         run: echo "VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
+      # Step 6: Build Docker image using the short Git commit SHA as the version
       - name: Build Docker image
         run: |
           cd crud-node-express
           docker build -t ${{ secrets.DOCKER_USERNAME }}/node-crud-app:${{ env.VERSION }} .
 
+      # Step 7: Tag the Docker image for AWS ECR
       - name: Tag Docker image for ECR
         run: |
           docker tag ${{ secrets.DOCKER_USERNAME }}/node-crud-app:${{ env.VERSION }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/node-crud-app:${{ env.VERSION }}
 
+      # Step 8: Push the Docker image to Docker Hub
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/node-crud-app:${{ env.VERSION }}
 
+      # Step 9: Configure AWS credentials to access AWS ECR
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -52,14 +61,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      # Step 10: Login to Amazon ECR
       - name: Login to Amazon ECR Private
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      # Step 11: Create ECR repository (if it doesn't already exist)
       - name: Create ECR Repository
         run: |
           aws ecr create-repository --repository-name node-crud-app || echo "Repository already exists"
 
+      # Step 12: Push Docker image to AWS ECR
       - name: Push Docker image to ECR
         run: |
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/node-crud-app:${{ env.VERSION }}
