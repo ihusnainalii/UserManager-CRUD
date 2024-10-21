@@ -30,14 +30,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: |
-          cd crud-node-express
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/node-crud-app .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/node-crud-app .
 
       - name: Docker Image Tag
-        run: |
-          cd crud-node-express
-          docker tag node-crud-app:latest ${{ secrets.DOCKER_USERNAME }}/node-crud-app:latest
+        run: docker tag node-crud-app:latest ${{ secrets.DOCKER_USERNAME }}/node-crud-app:latest
 
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/node-crud-app:latest
