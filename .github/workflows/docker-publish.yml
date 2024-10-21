@@ -1,4 +1,4 @@
-name: Node.js Docker CI/CD Pipeline
+name: Docker build and push CI/CD Pipeline
 
 on:
   push:
