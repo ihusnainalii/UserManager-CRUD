@@ -23,13 +23,19 @@ jobs:
           cd crud-node-express  # Change to the correct directory
           npm install
 
-      - name: Set environment variables
-        run: |
-          echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" >> $GITHUB_ENV
-          echo "DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD }}" >> $GITHUB_ENV
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push Docker Image
+      - name: Build Docker image
         run: |
           cd crud-node-express
-          make login
-          make build-and-push
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/node-crud-app:latest .
+
+      - name: Docker Image Tag
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/node-crud-app:latest ${{ secrets.DOCKER_USERNAME }}/node-crud-app:latest
+
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/node-crud-app:latest
