@@ -39,3 +39,19 @@ jobs:
 
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/node-crud-app:latest
+
+      - name: Log in to AWS ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_REGISTRY }}
+
+      - name: Create ECR Repository
+        run: |
+          aws ecr create-repository --repository-name node-crud-app || echo "Repository already exists"
+
+      - name: Tag Docker image for ECR
+        run: |
+          docker tag ${{ secrets.DOCKER_USERNAME }}/node-crud-app:latest ${{ secrets.AWS_ECR_REGISTRY }}/node-crud-app:latest
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push ${{ secrets.AWS_ECR_REGISTRY }}/node-crud-app:latest
