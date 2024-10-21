@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd UserManager-CRUD  # Change to the correct directory
+          cd crud-node-express  # Change to the correct directory
           npm install
 
       - name: Run tests
