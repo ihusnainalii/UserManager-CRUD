@@ -15,12 +15,3 @@ updates:
     open-pull-requests-limit: 5 # Limit the number of open PRs to 5
     ignore:
       - dependency-name: "some-deprecated-package" # Example of ignoring a package
-
-  # Docker image updates
-  - package-ecosystem: "docker"
-    directory: "/" # Location of your Dockerfile
-    schedule:
-      interval: "daily" # Check for updates daily
-    commit-message:
-      prefix: "fix" # Commit message prefix
-    open-pull-requests-limit: 5 # Limit the number of open PRs to 5
