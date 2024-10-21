@@ -1,8 +1,10 @@
 FROM node:alpine
 WORKDIR /usr/src/app
+
 COPY ./package.json ./
 COPY ./package-lock.json ./
 RUN npm install
+
 COPY ./.env ./
 COPY ./config ./config
 COPY ./controllers ./controllers
